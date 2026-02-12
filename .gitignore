@@ -53,3 +53,10 @@ nosetests.xml
 *.mo
 .eggs
 
+# Python virtual environments
+.venv/
+venv/
+ENV/
+
+# uv specific
+.uv/
