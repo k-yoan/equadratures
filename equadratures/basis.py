@@ -93,6 +93,9 @@ class Basis(object):
             basis = hyperbolic_basis(self.orders, self.q)
         elif name.lower() == "euclidean-degree":
             basis = euclidean_degree_basis(self.orders)
+        elif name.lower() == "hyperbolic-cross":
+            # New hyperbolic cross basis
+            basis = hyperbolic_cross(self.orders)
         else:
             raise ValueError( 'Basis __init__: invalid value for basis_type!')
             basis = [0]
@@ -182,6 +185,9 @@ class Basis(object):
         elif name == "sparse-grid":
             sparse_index, sparse_weight_factors, sparse_grid_set = sparse_grid_basis(self.level, self.growth_rule, self.dimensions) # Note sparse grid rule depends on points!
             return sparse_index, sparse_weight_factors, sparse_grid_set
+        elif name == "hyperbolic-cross":
+            # New hyperbolic cross basis
+            basis = hyperbolic_cross(self.orders)
         else:
             raise ValueError( 'invalid value for basis_type!')
             basis = [0]
@@ -395,6 +401,24 @@ def tensor_grid_basis(orders):
     # Ignore the first column of pp
     basis = I[:,1::]
     return basis
+
+def hyperbolic_cross(orders):
+    dimensions = len(orders)
+    n = orders[0]
+    I = np.arange(n+1)
+    I = np.reshape(I, (1,-1))
+    for k in range(2, dimensions+1):
+        J = np.array([]).reshape((I.shape[0]+1, 0))
+        for i in range(n+1):
+            l = I.shape[1]
+            for j in range(l):
+                z = I[:,j]
+                #z = np.reshape(z, (I.shape[0], 1))
+                if (i+1)*np.prod(z+1) <= n+1:
+                    z = np.row_stack((z.reshape((-1,1)), np.array([i]).reshape(1,1)))
+                    J = np.hstack((J, z))
+        I = J
+    return I.T
 
 def column(matrix, i):
     return [row[i] for row in matrix]
